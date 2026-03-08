@@ -10,6 +10,17 @@ from torch.utils.data import Dataset, DataLoader
 import torchaudio.transforms as T
 from torch.optim.lr_scheduler import LinearLR
 
+def get_filtered_onsets(y, sr, min_dist_sec=0.15):
+    import librosa
+    raw_onsets = librosa.onset.onset_detect(y=y, sr=sr, backtrack=True, units="samples")
+    filtered = []
+    min_dist = sr * min_dist_sec
+    for o in raw_onsets:
+        if not filtered or (o - filtered[-1]) > min_dist:
+            filtered.append(o)
+    return filtered
+
+
 
 # ---------------------------------------------------------
 # 1. CoAtNet Architecture
@@ -188,9 +199,7 @@ def load_all_chunks(data_dir):
         cls_dir = os.path.join(data_dir, cls)
         for audio_file in glob.glob(os.path.join(cls_dir, "*.wav")):
             y, sr = librosa.load(audio_file, sr=44100)
-            onsets = librosa.onset.onset_detect(
-                y=y, sr=sr, backtrack=True, units="samples"
-            )
+            onsets = get_filtered_onsets(y, sr)
 
             for onset in onsets:
                 start = int(onset)
@@ -332,7 +341,7 @@ def predict_audio(
     model.eval()
 
     y, sr = librosa.load(audio_path, sr=44100)
-    onsets = librosa.onset.onset_detect(y=y, sr=sr, backtrack=True, units="samples")
+    onsets = get_filtered_onsets(y, sr)
 
     predictions = []
     target_len = 14400  # 64x64
