@@ -229,7 +229,14 @@ def train_model(data_dir):
     train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
 
-    model = CoAtNet(num_classes=len(classes))
+    device = torch.device(
+        "mps"
+        if torch.backends.mps.is_available()
+        else ("cuda" if torch.cuda.is_available() else "cpu")
+    )
+    print(f"Using compute device: {device}")
+
+    model = CoAtNet(num_classes=len(classes)).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=5e-4)  # Max LR = 5e-4
 
@@ -258,6 +265,7 @@ def train_model(data_dir):
         total = 0
 
         for inputs, targets in train_loader:
+            inputs, targets = inputs.to(device), targets.to(device)
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = criterion(outputs, targets)
@@ -278,6 +286,7 @@ def train_model(data_dir):
         val_total = 0
         with torch.no_grad():
             for inputs, targets in val_loader:
+                inputs, targets = inputs.to(device), targets.to(device)
                 outputs = model(inputs)
                 _, predicted = torch.max(outputs.data, 1)
                 val_total += targets.size(0)
@@ -289,7 +298,7 @@ def train_model(data_dir):
             best_val_acc = val_acc
             torch.save(model.state_dict(), "keystroke_model_best.pth")
 
-        if (epoch + 1) % 10 == 0 or epoch == 0:
+        if True:
             print(
                 f"Epoch [{epoch + 1:4d}/{epochs}] Loss: {total_loss / len(train_loader):.4f} | Train Acc: {train_acc:.4f} | Val Acc: {val_acc:.4f} | Peak Val: {best_val_acc:.4f}"
             )
@@ -313,8 +322,13 @@ def predict_audio(
     with open(classes_path, "r") as f:
         classes = f.read().splitlines()
 
-    model = CoAtNet(num_classes=len(classes))
-    model.load_state_dict(torch.load(model_path))
+    device = torch.device(
+        "mps"
+        if torch.backends.mps.is_available()
+        else ("cuda" if torch.cuda.is_available() else "cpu")
+    )
+    model = CoAtNet(num_classes=len(classes)).to(device)
+    model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
     y, sr = librosa.load(audio_path, sr=44100)
@@ -339,7 +353,12 @@ def predict_audio(
                 melspec_db.max() - melspec_db.min() + 1e-6
             )
 
-            x = torch.tensor(melspec_db, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+            x = (
+                torch.tensor(melspec_db, dtype=torch.float32)
+                .unsqueeze(0)
+                .unsqueeze(0)
+                .to(device)
+            )
             outputs = model(x)
             _, predicted = torch.max(outputs.data, 1)
             predictions.append(classes[int(predicted.item())])
