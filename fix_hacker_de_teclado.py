@@ -1,6 +1,6 @@
 import re
 
-with open('teclahacker.py', 'r') as f:
+with open('hacker_de_teclado.py', 'r') as f:
     content = f.read()
 
 content = re.sub(
@@ -23,5 +23,5 @@ def get_filtered_onsets(y, sr, min_dist_sec=0.15):
 
 content = content.replace("from torch.optim.lr_scheduler import LinearLR\n", "from torch.optim.lr_scheduler import LinearLR\n" + helper_code + "\n")
 
-with open('teclahacker.py', 'w') as f:
+with open('hacker_de_teclado.py', 'w') as f:
     f.write(content)

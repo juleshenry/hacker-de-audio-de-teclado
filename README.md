@@ -1,4 +1,4 @@
-# teclahacker ⌨️🎧
+# hacker de teclado ⌨️🎧
 
 Uma implementação prática de um ataque de canal lateral acústico em teclados (Acoustic Side-Channel Attack) utilizando Deep Learning. 
 
@@ -35,13 +35,13 @@ Isso criará uma pasta `dados_falsos/` com áudios curtos simulando as teclas ne
 
 **2. Treinar a Rede Neural:**
 ```bash
-poetry run python teclahacker.py --treinar dados_falsos/
+poetry run python hacker_de_teclado.py --treinar dados_falsos/
 ```
 O script processará os áudios, extrairá os Espectrogramas de Mel e treinará a CNN. No final, salvará o modelo (`modelo_teclado.pth`) e as classes reconhecidas (`classes.txt`).
 
 **3. Testar a "escuta" (Predição):**
 ```bash
-poetry run python teclahacker.py --prever o_zorro_e_gris.wav
+poetry run python hacker_de_teclado.py --prever o_zorro_e_gris.wav
 ```
 O modelo tentará decodificar o áudio simulado e deverá imprimir algo muito próximo de `o zorro e gris`.
 
@@ -55,7 +55,7 @@ Para usar com o seu próprio teclado, siga esta estrutura:
    ```
 2. **Treinamento:** Finalize o treinamento na pasta com os áudios reais gravados:
    ```bash
-   poetry run python teclahacker.py --treinar dados_treino/
+   poetry run python hacker_de_teclado.py --treinar dados_treino/
    ```
 
 ### Testando o Modelo Real ("o zorro e gris")
@@ -72,7 +72,7 @@ poetry run python record_test.py
 **2. Execute o ataque (Previsão):**
 Agora, passe essa gravação real para o seu modelo totalmente treinado para ver se ele consegue decodificar o que você digitou:
 ```bash
-poetry run python teclahacker.py --prever meu_teste_zorro.wav
+poetry run python hacker_de_teclado.py --prever meu_teste_zorro.wav
 ```
 
 ## Arquitetura & Pipeline de Dados

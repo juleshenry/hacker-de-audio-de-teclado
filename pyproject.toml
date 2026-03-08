@@ -1,5 +1,5 @@
 [project]
-name = "teclahacker"
+name = "hacker_de_teclado"
 version = "0.1.0"
 description = "Acoustic side channel attack implementation"
 authors = [

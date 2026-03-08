@@ -52,7 +52,7 @@ def record_key(key_name, duration=5, sr=44100, output_dir="dados_treino"):
         print(f"⚠️ No keystrokes detected for '{key_name}'! Try hitting the key harder.")
         return 0
 
-    # Save the full recording so teclahacker.py can extract the keystrokes
+    # Save the full recording so hacker_de_teclado.py can extract the keystrokes
     key_dir = os.path.join(output_dir, key_name)
     os.makedirs(key_dir, exist_ok=True)
 
@@ -73,14 +73,14 @@ def record_key(key_name, duration=5, sr=44100, output_dir="dados_treino"):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Quickstart Prompter for Teclahacker")
+    parser = argparse.ArgumentParser(description="Quickstart Prompter for Hacker de Teclado")
     parser.add_argument(
         "--dir", default="dados_treino", help="Output directory for training data"
     )
     args = parser.parse_args()
 
     print("\n" + "=" * 50)
-    print("Welcome to Teclahacker Quickstart Engine ⌨️🎧")
+    print("Welcome to Hacker de Teclado Quickstart Engine ⌨️🎧")
     print("=" * 50)
 
     keys_input = input(
@@ -113,14 +113,14 @@ def main():
         if ans.lower() == "y":
             print("\n🚀 Starting training process...\n")
             subprocess.run(
-                ["poetry", "run", "python", "teclahacker.py", "--treinar", args.dir]
+                ["poetry", "run", "python", "hacker_de_teclado.py", "--treinar", args.dir]
             )
             print(
                 "\n🎉 Training completed! You can now use the model with the --prever argument."
             )
         else:
             print("\nSkipping training. You can train later by running:")
-            print(f"poetry run python teclahacker.py --treinar {args.dir}")
+            print(f"poetry run python hacker_de_teclado.py --treinar {args.dir}")
     else:
         print("\nNo samples were recorded successfully. Please try again.")
 

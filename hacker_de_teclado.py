@@ -381,7 +381,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Acoustic Keystroke Attack (teclahacker)"
+        description="Acoustic Keystroke Attack (hacker de teclado)"
     )
     parser.add_argument(
         "--treinar", type=str, help="Diretório contendo arquivos de áudio"

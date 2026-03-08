@@ -47,5 +47,5 @@ if __name__ == "__main__":
     create_dataset()
     create_test_sentence()
     print("Dataset e áudio de teste criados!")
-    print("Execute: poetry run python teclahacker.py --treinar dados_falsos")
-    print("Em seguida: poetry run python teclahacker.py --prever o_zorro_e_gris.wav")
+    print("Execute: poetry run python hacker_de_teclado.py --treinar dados_falsos")
+    print("Em seguida: poetry run python hacker_de_teclado.py --prever o_zorro_e_gris.wav")
