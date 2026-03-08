@@ -4,7 +4,7 @@ import numpy as np
 def get_onsets(y, sr):
     raw_onsets = librosa.onset.onset_detect(y=y, sr=sr, backtrack=True, units="samples")
     filtered = []
-    min_dist = sr * 0.2  # 200ms
+    min_dist = sr * 0.3  # 300ms
     
     for o in raw_onsets:
         if not filtered:

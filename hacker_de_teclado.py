@@ -10,8 +10,10 @@ from torch.utils.data import Dataset, DataLoader
 import torchaudio.transforms as T
 from torch.optim.lr_scheduler import LinearLR
 
-def get_filtered_onsets(y, sr, min_dist_sec=0.15):
+
+def get_filtered_onsets(y, sr, min_dist_sec=0.3):
     import librosa
+
     raw_onsets = librosa.onset.onset_detect(y=y, sr=sr, backtrack=True, units="samples")
     filtered = []
     min_dist = sr * min_dist_sec
@@ -19,7 +21,6 @@ def get_filtered_onsets(y, sr, min_dist_sec=0.15):
         if not filtered or (o - filtered[-1]) > min_dist:
             filtered.append(o)
     return filtered
-
 
 
 # ---------------------------------------------------------
@@ -256,6 +257,8 @@ def train_model(data_dir):
     )
 
     best_val_acc = 0.0
+    epochs_no_improve = 0
+    early_stopping_patience = 50
 
     print(f"\n--- Hyperparameters ---")
     print(
@@ -306,11 +309,20 @@ def train_model(data_dir):
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), "keystroke_model_best.pth")
+            epochs_no_improve = 0
+        else:
+            epochs_no_improve += 1
 
         if True:
             print(
                 f"Epoch [{epoch + 1:4d}/{epochs}] Loss: {total_loss / len(train_loader):.4f} | Train Acc: {train_acc:.4f} | Val Acc: {val_acc:.4f} | Peak Val: {best_val_acc:.4f}"
             )
+
+        if epochs_no_improve >= early_stopping_patience:
+            print(
+                f"\nEarly stopping triggered after {epoch + 1} epochs. No improvement for {early_stopping_patience} epochs."
+            )
+            break
 
     print(f"\nTraining Complete! Peak Validation Accuracy: {best_val_acc:.4f}")
 
@@ -351,8 +363,9 @@ def predict_audio(
             start = int(onset)
             end = start + target_len
             if end > len(y):
-                continue
-            chunk = y[int(start) : int(end)]
+                chunk = np.pad(y[int(start) :], (0, end - len(y)))
+            else:
+                chunk = y[int(start) : int(end)]
 
             melspec = librosa.feature.melspectrogram(
                 y=chunk, sr=44100, n_fft=1024, hop_length=225, n_mels=64
